@@ -1,0 +1,47 @@
+alias: sun360_param
+description: 'Refactorized sun360 LM lighting estimation'
+
+data:
+    type: data.SUN360_dataset
+    SUN360_dataset:
+        train:
+            split_file: ./data/splits/fake_kitti_training.csv
+            batch_size: 8
+            num_subimages: 16
+        validation:
+            split_file: ./data/splits/fake_kitti_validation.csv
+            batch_size: 8
+            num_subimages: 16
+            random_state: 1
+        test:
+            split_file: ./data/splits/fake_kitti_test.csv
+            batch_size: 1
+            num_subimages: 16
+            random_state: 1
+        
+trainer:
+    type: models.trainer
+    optimizer:
+        type: AdamW
+        lr: 1.e-5
+        weight_decay: 5.e-4
+    loss_light_vector:
+        type: light_vector_3d
+    loss_light:
+        type: light_vector_2d
+    loss_param:
+        type: mse
+    epochs: 1000
+    summary_freq: 100
+    img_freq: 100
+    end_epoch_validate: true
+    
+models:
+    lighting_estimator:
+        type: models.lighting_estimator
+        input_img_shape: [224, 224, 3] # max: 370 x 1220
+        out_dim: 512
+        mlp_dim: 1024
+        dropout_rate: 0.2
+        num_layers: 4
+        num_heads: 4
